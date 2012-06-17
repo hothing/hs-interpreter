@@ -12,33 +12,43 @@ $bin = [0-1]
 
 tokens :-
   $white+				;
-  $digit+				{ \s -> TInt (read s) } -- TODO: +, -
+  -- TODO: +, -
+  $digit+				{ \s -> TInt (read s) }
   ("0x" $hex+) 				{ \s -> TInt (fst.head.readHex.(\(_:_:xs) -> xs) $ s) }
   ("0b" $bin+)				{ \s -> TInt (foldl (\n c -> if c == '1' then n*2+1 else n*2) 0 $ (\(_:_:xs) -> xs) $ s) }
 
+  -- TODO: +, -
   ($digit+ "." $digit+)			{ \s -> TReal ( fst.head.readFloat $ s :: Double ) }
 
+  [\+ \- \* \/ \% \| \& \^]             { \s -> TBinOp s }
   "&&"					{ \s -> TBinOp s }
   "||"					{ \s -> TBinOp s }
   "<<"					{ \s -> TBinOp s }
   ">>"					{ \s -> TBinOp s }
   "**"					{ \s -> TBinOp s }
-  [\+ \- \* \/ \% \| \& \^]             { \s -> TBinOp s }
 
+  -- TODO: unary +, -
+  [\! \~]				{ \s -> TUnOp  s }
   "!!"		 			{ \s -> TUnOp  s }
-  [\! \~]				{ \s -> TUnOp  s } -- TODO: unary +, -
 
+  [\< \>]                               { \s -> TComOp s }
   "<="                                  { \s -> TComOp s }
   ">="                                  { \s -> TComOp s }
   "=="                                  { \s -> TComOp s }
-  "!="                                  { \s -> TComOp s }
-  [\< \>]                               { \s -> TComOp s }
+  "<>"                                  { \s -> TComOp s }
 
-  "="					{ \s -> TEquals }
+  [\!\~\+\-\*\/\%\|\&\^]? "="		{ \s -> TModif s }
+  "!!="					{ \s -> TModif s }
+  "**="					{ \s -> TModif s }
+  ">>="					{ \s -> TModif s }
+  "<<="					{ \s -> TModif s }
+  "||="					{ \s -> TModif s }
+  "&&="					{ \s -> TModif s }
+
   ";" 					{ \s -> TSemiColon }
   "("					{ \s -> TLeftParen }
   ")"					{ \s -> TRightParen }
-  [\_ $alpha] [$alpha $digit \_ ]*	{ \s -> TIdent s }
+  [$alpha] [$alpha $digit]*		{ \s -> TIdent s }
 {
 data Token =
 	TInt Int        |
@@ -46,7 +56,7 @@ data Token =
 	TBinOp String   |
 	TUnOp String    |
 	TComOp String   |
-	TEquals         |
+	TModif String   |
 	TSemiColon      |
 	TLeftParen 	|
 	TRightParen 	|
