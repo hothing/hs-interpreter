@@ -1,3 +1,4 @@
+-- Lex.x -*- mode: haskell -*-
 {
 module Lex where
 import Numeric
@@ -20,24 +21,30 @@ tokens :-
   -- TODO: +, -
   ($digit+ "." $digit+)			{ \s -> TReal ( fst.head.readFloat $ s :: Double ) }
 
-  [\+ \- \* \/ \% \| \& \^ \< \>]	{ \s -> TBinOp s }
-  "&&"					{ \s -> TBinOp s }
-  "||"					{ \s -> TBinOp s }
-  "<<"					{ \s -> TBinOp s }
-  ">>"					{ \s -> TBinOp s }
-  "**"					{ \s -> TBinOp s }
-  "<="                                  { \s -> TBinOp s }
-  ">="                                  { \s -> TBinOp s }
-  "=="                                  { \s -> TBinOp s }
-  "<>"                                  { \s -> TBinOp s }
+  "+"					{ \s -> TPlus }
+  "-"					{ \s -> TMinus }
+  "*"					{ \s -> TMul }
+  "/"					{ \s -> TDiv }
+  "%"					{ \s -> TMod }
+  "|"					{ \s -> TBinOr }
+  "&"					{ \s -> TBinAnd }
+  "^"					{ \s -> TBinXor }
+  "~"					{ \s -> TBinNot }
+  "!"					{ \s -> TLogNot }
+  "&&"					{ \s -> TLogAnd }
+  "||"					{ \s -> TLogOr }
+  "<<"					{ \s -> TShl }
+  ">>"					{ \s -> TShr }
 
-  -- TODO: unary +, -
-  [\! \~]				{ \s -> TUnOp  s }
-  "!!"		 			{ \s -> TUnOp  s }
+  "<"					{ \s -> TLt }
+  ">"					{ \s -> TGt }
+  "<="                                  { \s -> TLe }
+  ">="                                  { \s -> TGe }
+  "=="                                  { \s -> TEq }
+  "<>"                                  { \s -> TNe }
+
 
   [\!\~\+\-\*\/\%\|\&\^]? "="		{ \s -> TModif s }
-  "!!="					{ \s -> TModif s }
-  "**="					{ \s -> TModif s }
   ">>="					{ \s -> TModif s }
   "<<="					{ \s -> TModif s }
   "||="					{ \s -> TModif s }
@@ -53,9 +60,9 @@ tokens :-
 data Token =
 	TInt Int        |
 	TReal Double	|
-	TBinOp String   |
-	TUnOp String    |
 	TModif String   |
+	TPlus | TMinus | TMul | TDiv | TMod | TBinOr | TBinAnd | TBinXor | TBinNot |
+	TLogNot | TLogAnd | TLogOr | TShl | TShr | TLt | TGt | TLe | TGe | TEq | TNe |
 	TQuestion	|
 	TColon		|
 	TSemiColon      |
@@ -68,10 +75,28 @@ instance Show Token where
   show x = case x of
     TInt i -> show i
     TReal r -> show r
-    TBinOp s -> s
-    TUnOp s -> s
     TModif s -> s
     TIdent s -> s
+    TPlus -> "+"
+    TMinus -> "-"
+    TMul -> "*"
+    TDiv -> "/"
+    TMod -> "%"
+    TBinOr -> "|"
+    TBinAnd -> "&"
+    TBinXor -> "^"
+    TBinNot -> "~"
+    TLogNot -> "!"
+    TLogAnd -> "&&"
+    TLogOr -> "||"
+    TShl -> "<<"
+    TShr -> ">>"
+    TLt -> "<"
+    TGt -> ">"
+    TLe -> "<="
+    TGe -> ">="
+    TEq -> "=="
+    TNe -> "<>"
     TQuestion -> "?"
     TColon -> ":"
     TSemiColon -> ";"
