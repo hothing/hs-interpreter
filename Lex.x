@@ -62,5 +62,20 @@ data Token =
 	TLeftParen 	|
 	TRightParen 	|
 	TIdent String
-	deriving (Eq,Show)
+	deriving (Eq)
+
+instance Show Token where
+  show x = case x of
+    TInt i -> show i
+    TReal r -> show r
+    TBinOp s -> s
+    TUnOp s -> s
+    TModif s -> s
+    TIdent s -> s
+    TQuestion -> "?"
+    TColon -> ":"
+    TSemiColon -> ";"
+    TLeftParen -> "("
+    TRightParen -> ")"
+
 }

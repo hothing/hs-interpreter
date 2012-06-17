@@ -20,20 +20,19 @@ import Lex
   ident 				{ TIdent $$ }
 %%
 
-Program :
+Program:
 	ExprList			{ Program $1 }
 
-ExprList :
-	Expr				{ ExprList $1 ExprEnd }
-	| Expr ExprList			{ ExprList $1 $2 }
+ExprList:
+	Expr ExprList			{ ExprList $1 $2 }
 	|				{ ExprEnd }
 
-Expr :
+Expr:
 	ident modif RValue ";"		{ Expr $1 $2 $3 }
 
-RValue :
+RValue:
 	RValue binop RValue		{ BinOp $1 $2 $3 }
-	| unop RValue			{ UnOp $1 $2 }
+	unop RValue			{ UnOp $1 $2 }
 	| RValue "?" RValue ":" RValue  { IfElse $1 $3 $5 }
 	| "(" RValue ")"		{ Parens $2 }
 	| int				{ IntVal $1 }
@@ -41,7 +40,8 @@ RValue :
 	| ident				{ IdentVal $1 }
 {
 parseError :: [Token] -> a
-parseError xs = error $ "Parse error near: " ++ show xs
+parseError xs = 
+  error $ "Syntax error near: " ++ concatMap (\x -> show x ++ " ") (take 16 xs)
 
 data Program = Program ExprList
   deriving (Show, Eq)
