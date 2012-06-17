@@ -45,6 +45,8 @@ tokens :-
   "||="					{ \s -> TModif s }
   "&&="					{ \s -> TModif s }
 
+  "?"					{ \s -> TQuestion }
+  ":"					{ \s -> TColon }
   ";" 					{ \s -> TSemiColon }
   "("					{ \s -> TLeftParen }
   ")"					{ \s -> TRightParen }
@@ -57,6 +59,8 @@ data Token =
 	TUnOp String    |
 	TComOp String   |
 	TModif String   |
+	TQuestion	|
+	TColon		|
 	TSemiColon      |
 	TLeftParen 	|
 	TRightParen 	|
