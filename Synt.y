@@ -32,7 +32,7 @@ Expr:
 
 RValue:
 	RValue binop RValue		{ BinOp $1 $2 $3 }
-	unop RValue			{ UnOp $1 $2 }
+	| unop RValue			{ UnOp $1 $2 }
 	| RValue "?" RValue ":" RValue  { IfElse $1 $3 $5 }
 	| "(" RValue ")"		{ Parens $2 }
 	| int				{ IntVal $1 }
