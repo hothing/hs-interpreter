@@ -20,22 +20,20 @@ tokens :-
   -- TODO: +, -
   ($digit+ "." $digit+)			{ \s -> TReal ( fst.head.readFloat $ s :: Double ) }
 
-  [\+ \- \* \/ \% \| \& \^]             { \s -> TBinOp s }
+  [\+ \- \* \/ \% \| \& \^ \< \>]	{ \s -> TBinOp s }
   "&&"					{ \s -> TBinOp s }
   "||"					{ \s -> TBinOp s }
   "<<"					{ \s -> TBinOp s }
   ">>"					{ \s -> TBinOp s }
   "**"					{ \s -> TBinOp s }
+  "<="                                  { \s -> TBinOp s }
+  ">="                                  { \s -> TBinOp s }
+  "=="                                  { \s -> TBinOp s }
+  "<>"                                  { \s -> TBinOp s }
 
   -- TODO: unary +, -
   [\! \~]				{ \s -> TUnOp  s }
   "!!"		 			{ \s -> TUnOp  s }
-
-  [\< \>]                               { \s -> TComOp s }
-  "<="                                  { \s -> TComOp s }
-  ">="                                  { \s -> TComOp s }
-  "=="                                  { \s -> TComOp s }
-  "<>"                                  { \s -> TComOp s }
 
   [\!\~\+\-\*\/\%\|\&\^]? "="		{ \s -> TModif s }
   "!!="					{ \s -> TModif s }
@@ -57,7 +55,6 @@ data Token =
 	TReal Double	|
 	TBinOp String   |
 	TUnOp String    |
-	TComOp String   |
 	TModif String   |
 	TQuestion	|
 	TColon		|
