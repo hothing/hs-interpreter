@@ -1,5 +1,5 @@
 {
-module Main (main) where
+module Lex where
 import Numeric
 }
 
@@ -66,8 +66,4 @@ data Token =
 	TRightParen 	|
 	TIdent String
 	deriving (Eq,Show)
-
-main = do
-  s <- getContents
-  print (alexScanTokens s)
 }

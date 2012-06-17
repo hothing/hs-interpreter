@@ -2,3 +2,8 @@ Lex.hs
 Lex.hi
 Lex.o
 Lex
+Synt.hs
+Synt.hi
+Synt.o
+Synt
+*.swp
