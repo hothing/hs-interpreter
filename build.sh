@@ -1,9 +1,8 @@
-#!/usr/local/bin/bash
+#!/usr/bin/env bash
 
-rm Lex.{hs,hi,o}
-rm Synt.{hs,hi,o}
+./clean.sh
 
 alex Lex.x
 happy Synt.y
-ghc Lex.hs
-ghc Synt.hs
+ghc LexMain.hs
+ghc SyntMain.hs
