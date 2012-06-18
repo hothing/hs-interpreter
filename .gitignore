@@ -2,8 +2,14 @@ Lex.hs
 Lex.hi
 Lex.o
 Lex
+LexMain.hi
+LexMain.o
+LexMain
 Synt.hs
 Synt.hi
 Synt.o
 Synt
+SyntMain.hi
+SyntMain.o
+SyntMain
 *.swp

@@ -1,6 +1,6 @@
 -- Synt.y -*- mode: haskell -*-
 {
-module Main where
+module Synt where
 import Lex 
 }
 
@@ -111,9 +111,4 @@ data RVal =	IntVal Int | RealVal Double | IdentVal String
 		| Eq RVal RVal | Ne RVal RVal | Lt RVal RVal | Le RVal RVal | Gt RVal RVal | Ge RVal RVal
 		| Shl RVal RVal | Shr RVal RVal | LogNot RVal | BinNot RVal | IfElse RVal RVal RVal
   deriving (Show, Eq)
-
-main = do 
-  inStr <- getContents
-  let parseTree = synt.alexScanTokens $ inStr  
-  putStrLn.show $ parseTree
 }
