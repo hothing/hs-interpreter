@@ -2,10 +2,17 @@ module Main where
 import Lex
 import Synt
 import Interpret
+
+evalLoop ctx (x:xs) = do
+  let parseTree = synt.alexScanTokens $ x
+  case evalProgCtx ctx parseTree of
+    Right newCtx -> do
+      putStrLn $ show newCtx
+      evalLoop newCtx xs
+    Left err -> do
+      putStrLn $ "ERROR: " ++ err
+      evalLoop ctx xs
+
 main = do
---  input <- getContents
-  let parseTree = synt.alexScanTokens $ "a = 1; b = 2 + a; c = a + b;"
-  let out = case evalProg parseTree of
-            Right x -> show x
-            Left y -> "ERROR: " ++ y
-  putStrLn out 
+  input <- getContents
+  evalLoop createContext $ lines input

@@ -10,7 +10,6 @@ import Lex
 
 %token
 	int				{ TInt $$ }
-	real				{ TReal $$ }
 	'+'				{ TPlus }
 	'-'				{ TMinus }
 	'*'				{ TMul }
@@ -79,47 +78,46 @@ ExprList:
 
 Expr:
 	ident '=' RVal			{ Expr $1 $3 }
-	| ident '+=' RVal		{ Expr $1 (Add (IdentVal $1) $3) }
-	| ident '-=' RVal		{ Expr $1 (Sub (IdentVal $1) $3) }
-	| ident '*=' RVal		{ Expr $1 (Mul (IdentVal $1) $3) }
-	| ident '/=' RVal		{ Expr $1 (Div (IdentVal $1) $3) }
-	| ident '%=' RVal		{ Expr $1 (Mod (IdentVal $1) $3) }
-	| ident '<<=' RVal		{ Expr $1 (Shl (IdentVal $1) $3) }
-	| ident '>>=' RVal		{ Expr $1 (Shr (IdentVal $1) $3) }
-	| ident '&=' RVal		{ Expr $1 (BinAnd (IdentVal $1) $3) }
-	| ident '|=' RVal		{ Expr $1 (BinOr (IdentVal $1) $3) }
-	| ident '^=' RVal		{ Expr $1 (BinXor (IdentVal $1) $3) }
-	| ident '&&=' RVal		{ Expr $1 (LogAnd (IdentVal $1) $3) }
-	| ident '||=' RVal		{ Expr $1 (LogOr (IdentVal $1) $3) }
-	| ident '^^=' RVal		{ Expr $1 (LogXor (IdentVal $1) $3) }
+	| ident '+=' RVal		{ Expr $1 (BinOp Add (IdentVal $1) $3) }
+	| ident '-=' RVal		{ Expr $1 (BinOp Sub (IdentVal $1) $3) }
+	| ident '*=' RVal		{ Expr $1 (BinOp Mul (IdentVal $1) $3) }
+	| ident '/=' RVal		{ Expr $1 (BinOp Div (IdentVal $1) $3) }
+	| ident '%=' RVal		{ Expr $1 (BinOp Mod (IdentVal $1) $3) }
+	| ident '<<=' RVal		{ Expr $1 (BinOp Shl (IdentVal $1) $3) }
+	| ident '>>=' RVal		{ Expr $1 (BinOp Shl (IdentVal $1) (UnOp Neg $3)) }
+	| ident '&=' RVal		{ Expr $1 (BinOp BinAnd (IdentVal $1) $3) }
+	| ident '|=' RVal		{ Expr $1 (BinOp BinOr (IdentVal $1) $3) }
+	| ident '^=' RVal		{ Expr $1 (BinOp BinXor (IdentVal $1) $3) }
+	| ident '&&=' RVal		{ Expr $1 (BinOp LogAnd (IdentVal $1) $3) }
+	| ident '||=' RVal		{ Expr $1 (BinOp LogOr (IdentVal $1) $3) }
+	| ident '^^=' RVal		{ Expr $1 (BinOp LogXor (IdentVal $1) $3) }
 
 RVal:
-	RVal '+' RVal			{ Add $1 $3 }
-	| RVal '-' RVal			{ Sub $1 $3 }
-	| RVal '*' RVal			{ Mul $1 $3 }
-	| RVal '/' RVal			{ Div $1 $3 }
-	| RVal '%' RVal			{ Mod $1 $3 }
-	| RVal '&&' RVal		{ LogAnd $1 $3 }
-	| RVal '||' RVal		{ LogOr $1 $3 }
-	| RVal '^^' RVal		{ LogXor $1 $3 }
-	| RVal '&' RVal			{ BinAnd $1 $3 }
-	| RVal '|' RVal			{ BinOr $1 $3 }
-	| RVal '^' RVal			{ BinXor $1 $3 }
-	| RVal '==' RVal		{ Eq $1 $3 }
-	| RVal '<>' RVal		{ Ne $1 $3 }
-	| RVal '<' RVal			{ Lt $1 $3 }
-	| RVal '<=' RVal		{ Le $1 $3 }
-	| RVal '>' RVal			{ Gt $1 $3 }
-	| RVal '>=' RVal		{ Ge $1 $3 }
-	| RVal '<<' RVal		{ Shl $1 $3 }
-	| RVal '>>' RVal		{ Shr $1 $3 }
-	| '!' RVal			{ LogNot $2 }
-	| '~' RVal			{ BinNot $2 }
-	| '-' RVal %prec NEG		{ Neg $2 }
+	RVal '+' RVal			{ BinOp Add $1 $3 }
+	| RVal '-' RVal			{ BinOp Sub $1 $3 }
+	| RVal '*' RVal			{ BinOp Mul $1 $3 }
+	| RVal '/' RVal			{ BinOp Div $1 $3 }
+	| RVal '%' RVal			{ BinOp Mod $1 $3 }
+	| RVal '&&' RVal		{ BinOp LogAnd $1 $3 }
+	| RVal '||' RVal		{ BinOp LogOr $1 $3 }
+	| RVal '^^' RVal		{ BinOp LogXor $1 $3 }
+	| RVal '&' RVal			{ BinOp BinAnd $1 $3 }
+	| RVal '|' RVal			{ BinOp BinOr $1 $3 }
+	| RVal '^' RVal			{ BinOp BinXor $1 $3 }
+	| RVal '==' RVal		{ BinOp Eq $1 $3 }
+	| RVal '<>' RVal		{ UnOp LogNot (BinOp Eq $1 $3) }
+	| RVal '<' RVal			{ BinOp Lt $1 $3 }
+	| RVal '<=' RVal		{ BinOp Le $1 $3 }
+	| RVal '>' RVal			{ UnOp LogNot (BinOp Le $1 $3) }
+	| RVal '>=' RVal		{ UnOp LogNot (BinOp Lt $1 $3) }
+	| RVal '<<' RVal		{ BinOp Shl $1 $3 }
+	| RVal '>>' RVal		{ BinOp Shl $1 (UnOp Neg $3) }
+	| '!' RVal			{ UnOp LogNot $2 }
+	| '~' RVal			{ UnOp BinNot $2 }
+	| '-' RVal %prec NEG		{ UnOp Neg $2 }
 	| RVal '?' RVal ':' RVal	{ IfElse $1 $3 $5 }
 	| '(' RVal ')'			{ $2 }
 	| int				{ IntVal $1 }
-	| real				{ RealVal $1 }
 	| ident				{ IdentVal $1 }
 	
 {
@@ -127,19 +125,23 @@ parseError :: [Token] -> a
 parseError xs = 
   error $ "Syntax error near: " ++ concatMap (\x -> show x ++ " ") (take 16 xs)
 
-data Program = Program ExprList
-  deriving (Show, Eq)
+data Program =	Program ExprList
+		deriving (Show, Eq)
 
-data ExprList = ExprList Expr ExprList | ExprEnd
-  deriving (Show, Eq)
+data ExprList =	ExprList Expr ExprList | ExprEnd
+		deriving (Show, Eq)
 
-data Expr = Expr String RVal
-  deriving (Show, Eq)
+data Expr =	Expr String RVal
+		deriving (Show, Eq)
 
-data RVal =	IntVal Int | RealVal Double | IdentVal String
-		| Add RVal RVal | Sub RVal RVal | Mul RVal RVal | Div RVal RVal | Mod RVal RVal 
-		| LogOr RVal RVal | LogXor RVal RVal | LogAnd RVal RVal | BinAnd RVal RVal | BinOr RVal RVal | BinXor RVal RVal
-		| Eq RVal RVal | Ne RVal RVal | Lt RVal RVal | Le RVal RVal | Gt RVal RVal | Ge RVal RVal
-		| Shl RVal RVal | Shr RVal RVal | LogNot RVal | BinNot RVal | Neg RVal | IfElse RVal RVal RVal
-  deriving (Show, Eq)
+data BinOpType=	Add | Sub | Mul | Div | Mod | LogOr | LogXor | LogAnd | BinAnd | BinOr | BinXor
+		| Eq | Lt | Le | Shl
+		deriving (Show, Eq)
+
+data UnOpType =	LogNot | BinNot | Neg
+		deriving (Show, Eq)
+
+data RVal = 	IntVal Int | IdentVal String 
+		| BinOp BinOpType RVal RVal | UnOp UnOpType RVal | IfElse RVal RVal RVal
+		deriving (Show, Eq)
 }

@@ -1,31 +1,31 @@
 module Interpret (
-    Scalar,
     Context,
     createContext,
     getValue,
     evalProg,
-    evalExpr
+    evalProgCtx
   ) where
+
 import Synt
 import Data.Map as M
-import Control.Applicative
-
-data Scalar = SInt Int | SReal Double
-  deriving (Eq, Ord, Show)
+import Data.Bits
 
 data Context = Context {
-    variables :: M.Map String Scalar
+    variables :: M.Map String Int
   }
   deriving (Eq, Show)
 
 createContext :: Context
 createContext = Context { variables = M.empty }
 
-getValue :: Context -> String -> Maybe Scalar
+getValue :: Context -> String -> Maybe Int
 getValue ctx name = M.lookup name $ variables ctx
 
-evalProg :: Synt.Program -> Either String Context
-evalProg (Program lst) = evalProg' createContext lst
+evalProg :: Program -> Either String Context
+evalProg prog = evalProgCtx createContext prog
+
+evalProgCtx :: Context -> Program -> Either String Context
+evalProgCtx ctx (Program lst) = evalProg' ctx lst
   where
     evalProg' ctx (ExprList x xs) = 
       case evalExpr ctx x of
@@ -33,34 +33,77 @@ evalProg (Program lst) = evalProg' createContext lst
         err -> err
     evalProg' ctx ExprEnd = Right ctx
 
-evalExpr :: Context -> Synt.Expr -> Either String Context
+evalExpr :: Context -> Expr -> Either String Context
 evalExpr ctx (Expr vname rval) =
   case evalRVal ctx rval of
-    Right value -> Right $ ctx { variables = M.insert vname value $ variables ctx }
+    Right value -> Right $ ctx {
+        variables = M.insert vname value $ variables ctx
+      }
     Left err -> Left err
 
-scalarToRVal :: Scalar -> Synt.RVal
-scalarToRVal (SInt x) = IntVal x
-scalarToRVal (SReal x) = RealVal x
-
-evalRVal :: Context -> Synt.RVal -> Either String Scalar
+evalRVal :: Context -> RVal -> Either String Int
 
 evalRVal ctx (IdentVal ident) = 
   case getValue ctx ident of
     Just rval -> Right rval
     Nothing -> Left $ "Undefined variable '" ++ ident ++ "'"
 
-evalRVal ctx (Add (IntVal x) (RealVal y)) = evalRVal ctx (Add (RealVal $ fromIntegral x) (RealVal y))
-evalRVal ctx (Add (RealVal x) (IntVal y)) = evalRVal ctx (Add (RealVal x) (RealVal $ fromIntegral y))
-evalRVal _ (Add (IntVal x) (IntVal y)) = Right $ SInt (x + y)
-evalRVal _ (Add (RealVal x) (RealVal y)) = Right $ SReal (x + y)
-evalRVal ctx (Add a b) = 
+evalRVal _ (IfElse (IntVal x) (IntVal y) (IntVal z)) = 
+  Right $ if x /= 0 then y else z
+
+evalRVal ctx (IfElse a b c) = 
+  case (evalRVal ctx a, evalRVal ctx b, evalRVal ctx c) of
+    (Right x, Right y, Right z) -> Right $ if x /= 0 then y else z
+    (Right _, Right _, err) -> err
+    (Right _, err, _) -> err
+    (err, _, _) -> err
+
+evalRVal _ (BinOp cmd (IntVal x) (IntVal y)) =
+  evalBinOp cmd x y
+
+evalRVal ctx (BinOp cmd a b) = 
   case (evalRVal ctx a, evalRVal ctx b) of
-    (Right x, Right y) -> evalRVal ctx (Add (scalarToRVal x) (scalarToRVal y))
-    (Right x, err) -> err
+    (Right x, Right y) -> evalBinOp cmd x y
+    (Right _, err) -> err
     (err, _) -> err
 
-evalRVal _ (IntVal x) = Right $ SInt x
-evalRVal _ (RealVal x) = Right $ SReal x
+evalRVal _ (UnOp cmd (IntVal x)) =
+  evalUnOp cmd x
 
-evalRVal ctx rval = Right $ SInt 0
+evalRVal ctx (UnOp cmd a) = 
+  case evalRVal ctx a of
+    Right x -> evalUnOp cmd x
+    err -> err
+
+evalRVal _ (IntVal x) = Right x
+
+evalUnOp :: UnOpType -> Int -> Either String Int
+evalUnOp cmd x =
+  case cmd of
+    BinNot -> Right $ complement x
+    LogNot -> Right $ if not (x /= 0) then 1 else 0
+    Neg -> Right (-x)
+
+evalBinOp :: BinOpType -> Int -> Int -> Either String Int
+evalBinOp cmd x y =
+  case cmd of
+    Add -> Right $ x + y
+    Sub -> Right $ x - y
+    Mul -> Right $ x * y
+    BinAnd -> Right $ x .&. y
+    BinOr -> Right $ x .|. y
+    BinXor -> Right $ x `xor` y
+    LogAnd -> Right $ if (x /= 0) && (y /= 0) then 1 else 0
+    LogOr -> Right $ if (x /= 0) || (y /= 0) then 1 else 0
+    LogXor -> Right $ if ((x /= 0) && (y == 0)) || ((x == 0) && (y /= 0)) then 1 else 0
+    Eq -> Right $ if x == y then 1 else 0
+    Le -> Right $ if x <= y then 1 else 0
+    Lt -> Right $ if x < y then 1 else 0
+    Shl -> Right $ x `shift` y
+    Div -> if y == 0
+             then Left "Divide by zero!"
+             else Right $ x `div` y
+    Mod -> if y == 0
+             then Left "Divide by zero!"
+             else Right $ x `mod` y
+

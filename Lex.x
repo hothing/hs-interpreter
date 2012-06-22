@@ -6,8 +6,8 @@ import Numeric
 
 %wrapper "basic"
 
-$digit = [0-9]
 $alpha = [a-zA-Z]
+$digit = [0-9]
 $hex = [0-9a-fA-F]
 $bin = [0-1]
 
@@ -16,8 +16,6 @@ tokens :-
   $digit+				{ \s -> TInt (read s) }
   ("0x" $hex+) 				{ \s -> TInt (fst.head.readHex.(\(_:_:xs) -> xs) $ s) }
   ("0b" $bin+)				{ \s -> TInt (foldl (\n c -> if c == '1' then n*2+1 else n*2) 0 $ (\(_:_:xs) -> xs) $ s) }
-
-  ($digit+ "." $digit+)			{ \s -> TReal ( fst.head.readFloat $ s :: Double ) }
 
   [$alpha] [$alpha $digit]*		{ \s -> TIdent s }
 
@@ -66,7 +64,7 @@ tokens :-
   ")"					{ \s -> TRightParen }
 {
 data Token =
-	TInt Int | TReal Double | TIdent String 
+	TInt Int | TIdent String 
 	| TPlus | TMinus | TMul | TDiv | TMod | TBinOr | TBinAnd | TBinXor | TBinNot
 	| TLogNot | TLogAnd | TLogOr | TLogXor | TShl | TShr | TLt | TGt | TLe | TGe | TEq | TNe
 	| TModifSet | TModifPlus | TModifMinus | TModifMul | TModifDiv | TModifMod
@@ -77,7 +75,6 @@ data Token =
 instance Show Token where
   show x = case x of
     TInt i -> show i
-    TReal r -> show r
     TIdent s -> s
     TModifSet -> "="
     TModifPlus -> "+="
