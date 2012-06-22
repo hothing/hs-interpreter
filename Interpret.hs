@@ -23,7 +23,8 @@ createContext = Context { variables = M.empty }
 getValue :: Context -> String -> Maybe Scalar
 getValue ctx name = M.lookup name $ variables ctx
 
--- evalProg :: Synt.Program -> Either String Context
+--evalProg :: Synt.Program -> Either String Context
+--evalProg (Program (ExprList lst)) = evalProg' createContext lst
 -- TODO: applicative functor
 
 evalExpr :: Context -> Synt.Expr -> Either String Context
