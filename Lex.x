@@ -33,6 +33,7 @@ tokens :-
   "!"					{ \s -> TLogNot }
   "&&"					{ \s -> TLogAnd }
   "||"					{ \s -> TLogOr }
+  "^^"					{ \s -> TLogXor }
   "<<"					{ \s -> TShl }
   ">>"					{ \s -> TShr }
 
@@ -54,8 +55,9 @@ tokens :-
   "^="					{ \s -> TModifBinXor }
   ">>="					{ \s -> TModifShr }
   "<<="					{ \s -> TModifShl }
-  "||="					{ \s -> TModifLogOr }
   "&&="					{ \s -> TModifLogAnd }
+  "||="					{ \s -> TModifLogOr }
+  "^^="					{ \s -> TModifLogXor }
 
   "?"					{ \s -> TQuestion }
   ":"					{ \s -> TColon }
@@ -66,9 +68,9 @@ tokens :-
 data Token =
 	TInt Int | TReal Double | TIdent String 
 	| TPlus | TMinus | TMul | TDiv | TMod | TBinOr | TBinAnd | TBinXor | TBinNot
-	| TLogNot | TLogAnd | TLogOr | TShl | TShr | TLt | TGt | TLe | TGe | TEq | TNe
+	| TLogNot | TLogAnd | TLogOr | TLogXor | TShl | TShr | TLt | TGt | TLe | TGe | TEq | TNe
 	| TModifSet | TModifPlus | TModifMinus | TModifMul | TModifDiv | TModifMod
-	| TModifShr | TModifShl | TModifLogOr | TModifLogAnd |  TModifBinOr | TModifBinAnd | TModifBinXor
+	| TModifShr | TModifShl | TModifLogAnd | TModifLogOr | TModifLogXor | TModifBinOr | TModifBinAnd | TModifBinXor
 	| TQuestion | TColon | TSemiColon | TLeftParen | TRightParen
 	deriving (Eq)
 
@@ -88,8 +90,9 @@ instance Show Token where
     TModifBinXor -> "^="
     TModifShl -> "<<="
     TModifShr -> ">>="
-    TModifLogOr -> "||="
     TModifLogAnd -> "&&="
+    TModifLogOr -> "||="
+    TModifLogXor -> "^^="
     TPlus -> "+"
     TMinus -> "-"
     TMul -> "*"
@@ -102,6 +105,7 @@ instance Show Token where
     TLogNot -> "!"
     TLogAnd -> "&&"
     TLogOr -> "||"
+    TLogXor -> "^^"
     TShl -> "<<"
     TShr -> ">>"
     TLt -> "<"

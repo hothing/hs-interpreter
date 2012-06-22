@@ -17,6 +17,7 @@ import Lex
 	'/'				{ TDiv }
 	'%'				{ TMod }
 	'||'				{ TLogOr }
+	'^^'				{ TLogXor }
 	'&&'				{ TLogAnd }
 	'|'				{ TBinOr }
 	'&'				{ TBinAnd }
@@ -42,8 +43,9 @@ import Lex
 	'%='				{ TModifMod }
 	'<<='				{ TModifShl }
 	'>>='				{ TModifShr }
-	'||='				{ TModifLogOr }
 	'&&='				{ TModifLogAnd }
+	'||='				{ TModifLogOr }
+	'^^='				{ TModifLogXor }
 	'?'				{ TQuestion }
 	':'				{ TColon }
 	';' 				{ TSemiColon }
@@ -51,9 +53,10 @@ import Lex
 	')' 				{ TRightParen }
 	ident 				{ TIdent $$ }
 
-%right '=' '<<=' '>>=' '+=' '-=' '*=' '/=' '%=' '|=' '&=' '^=' '||=' '&&='
+%right '=' '<<=' '>>=' '+=' '-=' '*=' '/=' '%=' '&=' '|=' '^=' '&&=' '||=' '^^='
 %right '?' ':'
 %left '||'
+%left '^^'
 %left '&&'
 %left '|'
 %left '^'
@@ -86,8 +89,9 @@ Expr:
 	| ident '&=' RVal		{ Expr $1 (BinAnd (IdentVal $1) $3) }
 	| ident '|=' RVal		{ Expr $1 (BinOr (IdentVal $1) $3) }
 	| ident '^=' RVal		{ Expr $1 (BinXor (IdentVal $1) $3) }
-	| ident '||=' RVal		{ Expr $1 (LogOr (IdentVal $1) $3) }
 	| ident '&&=' RVal		{ Expr $1 (LogAnd (IdentVal $1) $3) }
+	| ident '||=' RVal		{ Expr $1 (LogOr (IdentVal $1) $3) }
+	| ident '^^=' RVal		{ Expr $1 (LogXor (IdentVal $1) $3) }
 
 RVal:
 	RVal '+' RVal			{ Add $1 $3 }
@@ -95,8 +99,9 @@ RVal:
 	| RVal '*' RVal			{ Mul $1 $3 }
 	| RVal '/' RVal			{ Div $1 $3 }
 	| RVal '%' RVal			{ Mod $1 $3 }
-	| RVal '||' RVal		{ LogOr $1 $3 }
 	| RVal '&&' RVal		{ LogAnd $1 $3 }
+	| RVal '||' RVal		{ LogOr $1 $3 }
+	| RVal '^^' RVal		{ LogXor $1 $3 }
 	| RVal '&' RVal			{ BinAnd $1 $3 }
 	| RVal '|' RVal			{ BinOr $1 $3 }
 	| RVal '^' RVal			{ BinXor $1 $3 }
@@ -133,7 +138,7 @@ data Expr = Expr String RVal
 
 data RVal =	IntVal Int | RealVal Double | IdentVal String
 		| Add RVal RVal | Sub RVal RVal | Mul RVal RVal | Div RVal RVal | Mod RVal RVal 
-		| LogOr RVal RVal | LogAnd RVal RVal | BinAnd RVal RVal | BinOr RVal RVal | BinXor RVal RVal
+		| LogOr RVal RVal | LogXor RVal RVal | LogAnd RVal RVal | BinAnd RVal RVal | BinOr RVal RVal | BinXor RVal RVal
 		| Eq RVal RVal | Ne RVal RVal | Lt RVal RVal | Le RVal RVal | Gt RVal RVal | Ge RVal RVal
 		| Shl RVal RVal | Shr RVal RVal | LogNot RVal | BinNot RVal | Neg RVal | IfElse RVal RVal RVal
   deriving (Show, Eq)
