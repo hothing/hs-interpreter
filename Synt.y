@@ -70,7 +70,7 @@ import Lex
 %left '+' '-'
 %left '*' '/' '%'
 %right '!' '~'
-%left NEG
+%right NEG
 %%
 
 Program:
