@@ -10,16 +10,13 @@ import Synt
 import Data.Map as M
 import Data.Bits
 
-data Context = Context {
-    variables :: M.Map String Int
-  }
-  deriving (Eq, Show)
+type Context = M.Map String Int
 
 createContext :: Context
-createContext = Context { variables = M.empty }
+createContext = M.empty
 
 getValue :: Context -> String -> Maybe Int
-getValue ctx name = M.lookup name $ variables ctx
+getValue ctx name = M.lookup name ctx
 
 evalProg :: Program -> Either String Context
 evalProg prog = evalProgCtx createContext prog
@@ -36,9 +33,7 @@ evalProgCtx ctx (Program lst) = evalProg' ctx lst
 evalExpr :: Context -> Expr -> Either String Context
 evalExpr ctx (Expr vname rval) =
   case evalRVal ctx rval of
-    Right value -> Right $ ctx {
-        variables = M.insert vname value $ variables ctx
-      }
+    Right value -> Right $ M.insert vname value ctx
     Left err -> Left err
 
 evalRVal :: Context -> RVal -> Either String Int
