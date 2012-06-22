@@ -45,6 +45,8 @@ tokens :-
   "!="                                  { \s -> TNe }
 
   "="					{ \s -> TModifSet }
+  "++"					{ \s -> TModifInc }
+  "--"					{ \s -> TModifDec }
   "+="					{ \s -> TModifPlus }
   "-="					{ \s -> TModifMinus }
   "*="					{ \s -> TModifMul }
@@ -72,7 +74,8 @@ data Token =
 	| TPlus | TMinus | TMul | TDiv | TMod | TBinOr | TBinAnd | TBinXor | TBinNot | TRor | TRol
 	| TLogNot | TLogAnd | TLogOr | TLogXor | TShl | TShr | TLt | TGt | TLe | TGe | TEq | TNe
 	| TModifSet | TModifPlus | TModifMinus | TModifMul | TModifDiv | TModifMod | TModifRol | TModifRor
-	| TModifShr | TModifShl | TModifLogAnd | TModifLogOr | TModifLogXor | TModifBinOr | TModifBinAnd | TModifBinXor
+	| TModifShr | TModifShl | TModifLogAnd | TModifLogOr | TModifLogXor | TModifBinOr 
+	| TModifBinAnd | TModifBinXor | TModifInc | TModifDec
 	| TQuestion | TColon | TSemiColon | TLeftParen | TRightParen
 	deriving (Eq)
 
@@ -96,6 +99,8 @@ instance Show Token where
     TModifLogXor -> "^^="
     TModifRol -> "<<<="
     TModifRor -> ">>>="
+    TModifInc -> "++"
+    TModifDec -> "--"
     TPlus -> "+"
     TMinus -> "-"
     TMul -> "*"

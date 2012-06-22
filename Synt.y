@@ -34,6 +34,8 @@ import Lex
 	'!'				{ TLogNot }
 	'~'				{ TBinNot }
 	'='				{ TModifSet }
+	'++'				{ TModifInc }
+	'--'				{ TModifDec }
 	'+='				{ TModifPlus }
 	'-='				{ TModifMinus }
 	'*='				{ TModifMul }
@@ -97,6 +99,10 @@ Expr:
 	| ident '&&=' RVal		{ Expr $1 (BinOp LogAnd (IdentVal $1) $3) }
 	| ident '||=' RVal		{ Expr $1 (BinOp LogOr (IdentVal $1) $3) }
 	| ident '^^=' RVal		{ Expr $1 (BinOp LogXor (IdentVal $1) $3) }
+	| ident '++'			{ Expr $1 (BinOp Add (IdentVal $1) (IntVal 1)) }
+	| '++' ident			{ Expr $2 (BinOp Add (IdentVal $2) (IntVal 1)) }
+	| ident '--'			{ Expr $1 (BinOp Sub (IdentVal $1) (IntVal 1)) }
+	| '--' ident			{ Expr $2 (BinOp Sub (IdentVal $2) (IntVal 1)) }
 
 RVal:
 	RVal '+' RVal			{ BinOp Add $1 $3 }
