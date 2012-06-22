@@ -3,7 +3,8 @@ module Interpret (
     Context,
     createContext,
     getValue,
-    eval
+--    evalProg,
+    evalExpr
   ) where
 import Synt
 import Data.Map as M
@@ -22,8 +23,11 @@ createContext = Context { variables = M.empty }
 getValue :: Context -> String -> Maybe Scalar
 getValue ctx name = M.lookup name $ variables ctx
 
-eval :: Context -> Synt.Expr -> Either String Context
-eval ctx (Expr vname rval) =
+-- evalProg :: Synt.Program -> Either String Context
+-- TODO: applicative functor
+
+evalExpr :: Context -> Synt.Expr -> Either String Context
+evalExpr ctx (Expr vname rval) =
   case evalRVal ctx rval of
     Right value -> Right $ ctx { variables = M.insert vname value $ variables ctx }
     Left err -> Left err
