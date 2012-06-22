@@ -34,13 +34,15 @@ tokens :-
   "^^"					{ \s -> TLogXor }
   "<<"					{ \s -> TShl }
   ">>"					{ \s -> TShr }
+  "<<<"					{ \s -> TRol }
+  ">>>"					{ \s -> TRor }
 
   "<"					{ \s -> TLt }
   ">"					{ \s -> TGt }
   "<="                                  { \s -> TLe }
   ">="                                  { \s -> TGe }
   "=="                                  { \s -> TEq }
-  "<>"                                  { \s -> TNe }
+  "!="                                  { \s -> TNe }
 
   "="					{ \s -> TModifSet }
   "+="					{ \s -> TModifPlus }
@@ -53,6 +55,8 @@ tokens :-
   "^="					{ \s -> TModifBinXor }
   ">>="					{ \s -> TModifShr }
   "<<="					{ \s -> TModifShl }
+  ">>>="				{ \s -> TModifRor }
+  "<<<="				{ \s -> TModifRol }
   "&&="					{ \s -> TModifLogAnd }
   "||="					{ \s -> TModifLogOr }
   "^^="					{ \s -> TModifLogXor }
@@ -65,9 +69,9 @@ tokens :-
 {
 data Token =
 	TInt Int | TIdent String 
-	| TPlus | TMinus | TMul | TDiv | TMod | TBinOr | TBinAnd | TBinXor | TBinNot
+	| TPlus | TMinus | TMul | TDiv | TMod | TBinOr | TBinAnd | TBinXor | TBinNot | TRor | TRol
 	| TLogNot | TLogAnd | TLogOr | TLogXor | TShl | TShr | TLt | TGt | TLe | TGe | TEq | TNe
-	| TModifSet | TModifPlus | TModifMinus | TModifMul | TModifDiv | TModifMod
+	| TModifSet | TModifPlus | TModifMinus | TModifMul | TModifDiv | TModifMod | TModifRol | TModifRor
 	| TModifShr | TModifShl | TModifLogAnd | TModifLogOr | TModifLogXor | TModifBinOr | TModifBinAnd | TModifBinXor
 	| TQuestion | TColon | TSemiColon | TLeftParen | TRightParen
 	deriving (Eq)
@@ -90,6 +94,8 @@ instance Show Token where
     TModifLogAnd -> "&&="
     TModifLogOr -> "||="
     TModifLogXor -> "^^="
+    TModifRol -> "<<<="
+    TModifRor -> ">>>="
     TPlus -> "+"
     TMinus -> "-"
     TMul -> "*"
@@ -105,12 +111,14 @@ instance Show Token where
     TLogXor -> "^^"
     TShl -> "<<"
     TShr -> ">>"
+    TRol -> "<<<"
+    TRor -> ">>>"
     TLt -> "<"
     TGt -> ">"
     TLe -> "<="
     TGe -> ">="
     TEq -> "=="
-    TNe -> "<>"
+    TNe -> "!="
     TQuestion -> "?"
     TColon -> ":"
     TSemiColon -> ";"

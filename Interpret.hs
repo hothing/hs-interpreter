@@ -100,6 +100,7 @@ evalBinOp cmd x y =
     Le -> Right $ if x <= y then 1 else 0
     Lt -> Right $ if x < y then 1 else 0
     Shl -> Right $ x `shift` y
+    Rol -> Right $ x `rotate` y
     Div -> if y == 0
              then Left "Divide by zero!"
              else Right $ x `div` y

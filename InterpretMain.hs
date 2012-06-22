@@ -13,6 +13,8 @@ evalLoop ctx (x:xs) = do
       putStrLn $ "ERROR: " ++ err
       evalLoop ctx xs
 
+evalLoop _ [] = do return ()
+
 main = do
   input <- getContents
   evalLoop createContext $ lines input

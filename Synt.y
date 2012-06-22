@@ -29,6 +29,8 @@ import Lex
 	'>='				{ TGe }
 	'<<'				{ TShl }
 	'>>'				{ TShr }
+	'<<<'				{ TRol }
+	'>>>'				{ TRor }
 	'!'				{ TLogNot }
 	'~'				{ TBinNot }
 	'='				{ TModifSet }
@@ -42,6 +44,8 @@ import Lex
 	'%='				{ TModifMod }
 	'<<='				{ TModifShl }
 	'>>='				{ TModifShr }
+	'<<<='				{ TModifRol }
+	'>>>='				{ TModifRor }
 	'&&='				{ TModifLogAnd }
 	'||='				{ TModifLogOr }
 	'^^='				{ TModifLogXor }
@@ -52,7 +56,7 @@ import Lex
 	')' 				{ TRightParen }
 	ident 				{ TIdent $$ }
 
-%right '=' '<<=' '>>=' '+=' '-=' '*=' '/=' '%=' '&=' '|=' '^=' '&&=' '||=' '^^='
+%right '=' '<<=' '>>=' '<<<=' '>>>=' '+=' '-=' '*=' '/=' '%=' '&=' '|=' '^=' '&&=' '||=' '^^='
 %right '?' ':'
 %left '||'
 %left '^^'
@@ -62,7 +66,7 @@ import Lex
 %left '&'
 %left '==' '<>'
 %left '<' '<=' '>' '>='
-%left '>>' '<<'
+%left '>>' '<<' '<<<' '>>>'
 %left '+' '-'
 %left '*' '/' '%'
 %right '!' '~'
@@ -84,7 +88,9 @@ Expr:
 	| ident '/=' RVal		{ Expr $1 (BinOp Div (IdentVal $1) $3) }
 	| ident '%=' RVal		{ Expr $1 (BinOp Mod (IdentVal $1) $3) }
 	| ident '<<=' RVal		{ Expr $1 (BinOp Shl (IdentVal $1) $3) }
+	| ident '<<<=' RVal		{ Expr $1 (BinOp Rol (IdentVal $1) $3) }
 	| ident '>>=' RVal		{ Expr $1 (BinOp Shl (IdentVal $1) (UnOp Neg $3)) }
+	| ident '>>>=' RVal		{ Expr $1 (BinOp Rol (IdentVal $1) (UnOp Neg $3)) }
 	| ident '&=' RVal		{ Expr $1 (BinOp BinAnd (IdentVal $1) $3) }
 	| ident '|=' RVal		{ Expr $1 (BinOp BinOr (IdentVal $1) $3) }
 	| ident '^=' RVal		{ Expr $1 (BinOp BinXor (IdentVal $1) $3) }
@@ -111,7 +117,9 @@ RVal:
 	| RVal '>' RVal			{ UnOp LogNot (BinOp Le $1 $3) }
 	| RVal '>=' RVal		{ UnOp LogNot (BinOp Lt $1 $3) }
 	| RVal '<<' RVal		{ BinOp Shl $1 $3 }
+	| RVal '<<<' RVal		{ BinOp Rol $1 $3 }
 	| RVal '>>' RVal		{ BinOp Shl $1 (UnOp Neg $3) }
+	| RVal '>>>' RVal		{ BinOp Rol $1 (UnOp Neg $3) }
 	| '!' RVal			{ UnOp LogNot $2 }
 	| '~' RVal			{ UnOp BinNot $2 }
 	| '-' RVal %prec NEG		{ UnOp Neg $2 }
@@ -135,7 +143,7 @@ data Expr =	Expr String RVal
 		deriving (Show, Eq)
 
 data BinOpType=	Add | Sub | Mul | Div | Mod | LogOr | LogXor | LogAnd | BinAnd | BinOr | BinXor
-		| Eq | Lt | Le | Shl
+		| Eq | Lt | Le | Shl | Rol
 		deriving (Show, Eq)
 
 data UnOpType =	LogNot | BinNot | Neg
