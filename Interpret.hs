@@ -3,11 +3,12 @@ module Interpret (
     Context,
     createContext,
     getValue,
---    evalProg,
+    evalProg,
     evalExpr
   ) where
 import Synt
 import Data.Map as M
+import Control.Applicative
 
 data Scalar = SInt Int | SReal Double
   deriving (Eq, Ord, Show)
@@ -23,9 +24,14 @@ createContext = Context { variables = M.empty }
 getValue :: Context -> String -> Maybe Scalar
 getValue ctx name = M.lookup name $ variables ctx
 
---evalProg :: Synt.Program -> Either String Context
---evalProg (Program (ExprList lst)) = evalProg' createContext lst
--- TODO: applicative functor
+evalProg :: Synt.Program -> Either String Context
+evalProg (Program lst) = evalProg' createContext lst
+  where
+    evalProg' ctx (ExprList x xs) = 
+      case evalExpr ctx x of
+        Right y -> evalProg' y xs
+        z -> z
+    evalProg' ctx ExprEnd = Right ctx
 
 evalExpr :: Context -> Synt.Expr -> Either String Context
 evalExpr ctx (Expr vname rval) =
