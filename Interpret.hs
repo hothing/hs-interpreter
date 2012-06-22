@@ -29,8 +29,8 @@ evalProg (Program lst) = evalProg' createContext lst
   where
     evalProg' ctx (ExprList x xs) = 
       case evalExpr ctx x of
-        Right y -> evalProg' y xs
-        z -> z
+        Right rslt -> evalProg' rslt xs
+        err -> err
     evalProg' ctx ExprEnd = Right ctx
 
 evalExpr :: Context -> Synt.Expr -> Either String Context
@@ -49,7 +49,6 @@ evalRVal ctx (IdentVal ident) =
   case getValue ctx ident of
     Just rval -> Right rval
     Nothing -> Left $ "Undefined variable '" ++ ident ++ "'"
-
 
 evalRVal ctx (Add (IntVal x) (RealVal y)) = evalRVal ctx (Add (RealVal $ fromIntegral x) (RealVal y))
 evalRVal ctx (Add (RealVal x) (IntVal y)) = evalRVal ctx (Add (RealVal x) (RealVal $ fromIntegral y))
