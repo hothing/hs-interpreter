@@ -52,6 +52,7 @@ import Lex
 %left '+' '-'
 %left '*' '/' '%'
 %right '!' '~'
+%left NEG
 %%
 
 Program:
@@ -85,6 +86,7 @@ RVal:
 	| RVal '>>' RVal		{ Shr $1 $3 }
 	| '!' RVal			{ LogNot $2 }
 	| '~' RVal			{ BinNot $2 }
+	| '-' RVal %prec NEG		{ Neg $2 }
 	| RVal '?' RVal ':' RVal	{ IfElse $1 $3 $5 }
 	| '(' RVal ')'			{ $2 }
 	| int				{ IntVal $1 }
@@ -109,6 +111,6 @@ data RVal =	IntVal Int | RealVal Double | IdentVal String
 		| Add RVal RVal | Sub RVal RVal | Mul RVal RVal | Div RVal RVal | Mod RVal RVal 
 		| LogOr RVal RVal | LogAnd RVal RVal | BinAnd RVal RVal | BinOr RVal RVal | BinXor RVal RVal
 		| Eq RVal RVal | Ne RVal RVal | Lt RVal RVal | Le RVal RVal | Gt RVal RVal | Ge RVal RVal
-		| Shl RVal RVal | Shr RVal RVal | LogNot RVal | BinNot RVal | IfElse RVal RVal RVal
+		| Shl RVal RVal | Shr RVal RVal | LogNot RVal | BinNot RVal | Neg RVal | IfElse RVal RVal RVal
   deriving (Show, Eq)
 }
