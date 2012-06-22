@@ -12,4 +12,6 @@ Synt
 SyntMain.hi
 SyntMain.o
 SyntMain
+Interpret.hi
+Interpret.o
 *.swp

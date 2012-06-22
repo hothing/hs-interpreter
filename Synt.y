@@ -31,7 +31,19 @@ import Lex
 	'>>'				{ TShr }
 	'!'				{ TLogNot }
 	'~'				{ TBinNot }
-	modif				{ TModif $$ }
+	'='				{ TModifSet }
+	'+='				{ TModifPlus }
+	'-='				{ TModifMinus }
+	'*='				{ TModifMul }
+	'/='				{ TModifDiv }
+	'&='				{ TModifBinAnd }
+	'|='				{ TModifBinOr }
+	'^='				{ TModifBinXor }
+	'%='				{ TModifMod }
+	'<<='				{ TModifShl }
+	'>>='				{ TModifShr }
+	'||='				{ TModifLogOr }
+	'&&='				{ TModifLogAnd }
 	'?'				{ TQuestion }
 	':'				{ TColon }
 	';' 				{ TSemiColon }
@@ -39,7 +51,7 @@ import Lex
 	')' 				{ TRightParen }
 	ident 				{ TIdent $$ }
 
-%right modif
+%right '=' '<<=' '>>=' '+=' '-=' '*=' '/=' '%=' '|=' '&=' '^=' '||=' '&&='
 %right '?' ':'
 %left '||'
 %left '&&'
@@ -59,11 +71,23 @@ Program:
 	ExprList			{ Program $1 }
 
 ExprList:
-	Expr ExprList			{ ExprList $1 $2 }
+	Expr ';' ExprList		{ ExprList $1 $3 }
 	|				{ ExprEnd }
 
 Expr:
-	ident modif RVal ';'		{ Expr $1 $2 $3 }
+	ident '=' RVal			{ Expr $1 $3 }
+	| ident '+=' RVal		{ Expr $1 (Add (IdentVal $1) $3) }
+	| ident '-=' RVal		{ Expr $1 (Sub (IdentVal $1) $3) }
+	| ident '*=' RVal		{ Expr $1 (Mul (IdentVal $1) $3) }
+	| ident '/=' RVal		{ Expr $1 (Div (IdentVal $1) $3) }
+	| ident '%=' RVal		{ Expr $1 (Mod (IdentVal $1) $3) }
+	| ident '<<=' RVal		{ Expr $1 (Shl (IdentVal $1) $3) }
+	| ident '>>=' RVal		{ Expr $1 (Shr (IdentVal $1) $3) }
+	| ident '&=' RVal		{ Expr $1 (BinAnd (IdentVal $1) $3) }
+	| ident '|=' RVal		{ Expr $1 (BinOr (IdentVal $1) $3) }
+	| ident '^=' RVal		{ Expr $1 (BinXor (IdentVal $1) $3) }
+	| ident '||=' RVal		{ Expr $1 (LogOr (IdentVal $1) $3) }
+	| ident '&&=' RVal		{ Expr $1 (LogAnd (IdentVal $1) $3) }
 
 RVal:
 	RVal '+' RVal			{ Add $1 $3 }
@@ -104,7 +128,7 @@ data Program = Program ExprList
 data ExprList = ExprList Expr ExprList | ExprEnd
   deriving (Show, Eq)
 
-data Expr = Expr String String RVal
+data Expr = Expr String RVal
   deriving (Show, Eq)
 
 data RVal =	IntVal Int | RealVal Double | IdentVal String

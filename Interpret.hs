@@ -14,7 +14,7 @@ data Scalar = SInt Int | SReal Double
 
 data Context = Context {
     variables :: M.Map String Scalar,
-    isError ::  Bool 
+    isError ::  Bool -- TODO: devision by zero?
   }
   deriving (Eq, Show)
 
@@ -25,4 +25,4 @@ getValue :: Context -> String -> Maybe Scalar
 getValue ctx name = M.lookup name $ variables ctx
 
 eval :: Context -> Synt.Expr -> Context
-eval ctx (Expr varName operator expr) = ctx
+eval ctx (Expr var expr) = ctx
