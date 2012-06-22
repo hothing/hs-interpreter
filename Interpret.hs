@@ -40,4 +40,10 @@ evalExpr ctx (Expr vname rval) =
     Left err -> Left err
 
 evalRVal :: Context -> Synt.RVal -> Either String Scalar
+
+evalRVal ctx (IdentVal ident) = 
+  case getValue ctx ident of
+    Just rval -> Right rval
+    Nothing -> Left $ "Undefined variable '" ++ ident ++ "'"
+
 evalRVal ctx rval = Right $ SInt 0
