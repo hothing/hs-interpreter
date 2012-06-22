@@ -10,10 +10,10 @@ import Synt
 import Data.Map as M
 import Data.Bits
 
-type Context = M.Map String Int
+type Context = Map String Int
 
 createContext :: Context
-createContext = M.empty
+createContext = empty
 
 getValue :: Context -> String -> Maybe Int
 getValue ctx name = M.lookup name ctx
@@ -33,7 +33,7 @@ evalProgCtx ctx (Program lst) = evalProg' ctx lst
 evalExpr :: Context -> Expr -> Either String Context
 evalExpr ctx (Expr vname rval) =
   case evalRVal ctx rval of
-    Right value -> Right $ M.insert vname value ctx
+    Right value -> Right $ insert vname value ctx
     Left err -> Left err
 
 evalRVal :: Context -> RVal -> Either String Int
