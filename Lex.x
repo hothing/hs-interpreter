@@ -4,7 +4,7 @@ module Lex where
 import Numeric
 }
 
-%wrapper "monadUserState"
+%wrapper "basic"
 
 $alpha = [a-zA-Z]
 $digit = [0-9]
@@ -69,27 +69,6 @@ tokens :-
   "("					{ \s -> TLeftParen }
   ")"					{ \s -> TRightParen }
 {
-
-type AlexUserState = [Int]
-alexInitUserState = [] 
-
-getUserData :: Alex AlexUserState
-getUserData = Alex $ \s@AlexState{alex_ust=udata} -> Right (s, udata)
-
-setUserData :: AlexUserState -> Alex () 
-setUserData udata = Alex $ \s -> Right (s{alex_ust=udata}, ())
-
-alexEOF :: Alex (Maybe Token) 
-alexEOF = return Nothing
-
-run :: String -> Either String [Token] 
-run content = runAlex content $ loop [] 
-
-loop end = do
-  tok <- alexMonadScan
-  case tok of 
-    Nothing -> return end
-    Just t -> loop end >>= \e -> return $ t : e
 
 data Token =
 	TInt Int | TIdent String 
