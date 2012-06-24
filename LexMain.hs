@@ -3,4 +3,8 @@ import Lex
 
 main = do
   s <- getContents
-  putStrLn $ concatMap (\s -> "'" ++ show s ++ "' ") $ alexScanTokens s
+  case alexScanTokens s of
+    Right lst -> do
+      putStrLn $ concatMap (\t -> "'" ++ show t ++ "' ") lst
+    Left err -> do
+      putStrLn $ "ERROR: " ++ err

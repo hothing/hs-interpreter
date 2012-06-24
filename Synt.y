@@ -10,6 +10,7 @@ import Lex
 
 %token
 	int				{ TInt $$ }
+	ident 				{ TIdent $$ }
 	'+'				{ TPlus }
 	'-'				{ TMinus }
 	'*'				{ TMul }
@@ -56,7 +57,7 @@ import Lex
 	';' 				{ TSemiColon }
 	'('				{ TLeftParen }
 	')' 				{ TRightParen }
-	ident 				{ TIdent $$ }
+	'EOF'				{ TEOF }
 
 %right '=' '<<=' '>>=' '<<<=' '>>>=' '+=' '-=' '*=' '/=' '%=' '&=' '|=' '^=' '&&=' '||=' '^^='
 %right '?' ':'
@@ -80,7 +81,7 @@ Program:
 
 ExprList:
 	Expr ';' ExprList		{ ExprList $1 $3 }
-	|				{ ExprEnd }
+	| 'EOF'				{ ExprEnd }
 
 Expr:
 	ident '=' RVal			{ Expr $1 $3 }
