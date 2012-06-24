@@ -6,7 +6,7 @@ import Lex
 
 %name synt
 %tokentype { Token }
-%error { parseError }
+%monad { Maybe } { (>>=) } { return }
 
 %token
 	int				{ TInt $$ }
@@ -136,9 +136,8 @@ RVal:
 	| ident				{ IdentVal $1 }
 	
 {
-parseError :: [Token] -> a
-parseError xs = 
-  error $ "Syntax error near: " ++ concatMap (\x -> show x ++ " ") (take 16 xs)
+
+happyError _ = Nothing 
 
 data Program =	Program ExprList
 		deriving (Show, Eq)

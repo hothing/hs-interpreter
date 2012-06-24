@@ -6,8 +6,11 @@ main = do
   inStr <- getContents
   case alexScanTokens inStr of
     Right lst -> do
-      let parseTree = synt lst
-      putStrLn.show $ parseTree
+      case synt lst of
+        Just tree -> do
+          putStrLn.show $ tree
+        Nothing -> do
+         putStrLn "Syntax error"
     Left err -> do
       putStrLn $ err
 
