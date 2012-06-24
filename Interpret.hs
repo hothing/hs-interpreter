@@ -10,13 +10,17 @@ import Synt
 import Data.Map as M
 import Data.Bits
 
-type Context = Map String Int
+newtype Context = Context { impl :: Map String Int }
+instance Show Context where
+  show ctx = 
+    concatMap (\(k,v) -> "  " ++ k ++ " = " ++ show v ++ "\n")
+      $ toList.impl $ ctx
 
 createContext :: Context
-createContext = empty
+createContext = Context { impl = empty }
 
 getValue :: Context -> String -> Maybe Int
-getValue ctx name = M.lookup name ctx
+getValue ctx name = M.lookup name $ impl ctx
 
 evalProg :: Program -> Either String Context
 evalProg prog = evalProgCtx createContext prog
@@ -33,7 +37,7 @@ evalProgCtx ctx (Program lst) =
 evalExpr :: Context -> Expr -> Either String Context
 evalExpr ctx (Expr vname rval) = do
   val <- evalRVal ctx rval
-  return $ insert vname val ctx
+  return $ Context { impl = insert vname val $ impl ctx }
 
 evalError :: String -> Either String Int
 evalError s = Left s
