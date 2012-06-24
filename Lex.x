@@ -4,7 +4,7 @@ module Lex where
 import Numeric
 }
 
-%wrapper "basic"
+%wrapper "posn"
 
 $alpha = [a-zA-Z]
 $digit = [0-9]
@@ -13,61 +13,61 @@ $bin = [0-1]
 
 tokens :-
   $white+				;
-  $digit+				{ \s -> TInt (read s) }
-  ("0x" $hex+) 				{ \s -> TInt (fst.head.readHex.(\(_:_:xs) -> xs) $ s) }
-  ("0b" $bin+)				{ \s -> TInt (foldl (\n c -> if c == '1' then n*2+1 else n*2) 0 $ (\(_:_:xs) -> xs) $ s) }
+  $digit+				{ \p s -> TInt (read s) }
+  ("0x" $hex+) 				{ \p s -> TInt (fst.head.readHex.(\(_:_:xs) -> xs) $ s) }
+  ("0b" $bin+)				{ \p s -> TInt (foldl (\n c -> if c == '1' then n*2+1 else n*2) 0 $ (\(_:_:xs) -> xs) $ s) }
 
-  [$alpha] [$alpha $digit]*		{ \s -> TIdent s }
+  [$alpha] [$alpha $digit]*		{ \p s -> TIdent s }
 
-  "+"					{ \s -> TPlus }
-  "-"					{ \s -> TMinus }
-  "*"					{ \s -> TMul }
-  "/"					{ \s -> TDiv }
-  "%"					{ \s -> TMod }
-  "|"					{ \s -> TBinOr }
-  "&"					{ \s -> TBinAnd }
-  "^"					{ \s -> TBinXor }
-  "~"					{ \s -> TBinNot }
-  "!"					{ \s -> TLogNot }
-  "&&"					{ \s -> TLogAnd }
-  "||"					{ \s -> TLogOr }
-  "^^"					{ \s -> TLogXor }
-  "<<"					{ \s -> TShl }
-  ">>"					{ \s -> TShr }
-  "<<<"					{ \s -> TRol }
-  ">>>"					{ \s -> TRor }
+  "+"					{ \p s -> TPlus }
+  "-"					{ \p s -> TMinus }
+  "*"					{ \p s -> TMul }
+  "/"					{ \p s -> TDiv }
+  "%"					{ \p s -> TMod }
+  "|"					{ \p s -> TBinOr }
+  "&"					{ \p s -> TBinAnd }
+  "^"					{ \p s -> TBinXor }
+  "~"					{ \p s -> TBinNot }
+  "!"					{ \p s -> TLogNot }
+  "&&"					{ \p s -> TLogAnd }
+  "||"					{ \p s -> TLogOr }
+  "^^"					{ \p s -> TLogXor }
+  "<<"					{ \p s -> TShl }
+  ">>"					{ \p s -> TShr }
+  "<<<"					{ \p s -> TRol }
+  ">>>"					{ \p s -> TRor }
 
-  "<"					{ \s -> TLt }
-  ">"					{ \s -> TGt }
-  "<="                                  { \s -> TLe }
-  ">="                                  { \s -> TGe }
-  "=="                                  { \s -> TEq }
-  "!="                                  { \s -> TNe }
+  "<"					{ \p s -> TLt }
+  ">"					{ \p s -> TGt }
+  "<="                                  { \p s -> TLe }
+  ">="                                  { \p s -> TGe }
+  "=="                                  { \p s -> TEq }
+  "!="                                  { \p s -> TNe }
 
-  "="					{ \s -> TModifSet }
-  "++"					{ \s -> TModifInc }
-  "--"					{ \s -> TModifDec }
-  "+="					{ \s -> TModifPlus }
-  "-="					{ \s -> TModifMinus }
-  "*="					{ \s -> TModifMul }
-  "/="					{ \s -> TModifDiv }
-  "%="					{ \s -> TModifMod }
-  "|="					{ \s -> TModifBinOr }
-  "&="					{ \s -> TModifBinAnd }
-  "^="					{ \s -> TModifBinXor }
-  ">>="					{ \s -> TModifShr }
-  "<<="					{ \s -> TModifShl }
-  ">>>="				{ \s -> TModifRor }
-  "<<<="				{ \s -> TModifRol }
-  "&&="					{ \s -> TModifLogAnd }
-  "||="					{ \s -> TModifLogOr }
-  "^^="					{ \s -> TModifLogXor }
+  "="					{ \p s -> TModifSet }
+  "++"					{ \p s -> TModifInc }
+  "--"					{ \p s -> TModifDec }
+  "+="					{ \p s -> TModifPlus }
+  "-="					{ \p s -> TModifMinus }
+  "*="					{ \p s -> TModifMul }
+  "/="					{ \p s -> TModifDiv }
+  "%="					{ \p s -> TModifMod }
+  "|="					{ \p s -> TModifBinOr }
+  "&="					{ \p s -> TModifBinAnd }
+  "^="					{ \p s -> TModifBinXor }
+  ">>="					{ \p s -> TModifShr }
+  "<<="					{ \p s -> TModifShl }
+  ">>>="				{ \p s -> TModifRor }
+  "<<<="				{ \p s -> TModifRol }
+  "&&="					{ \p s -> TModifLogAnd }
+  "||="					{ \p s -> TModifLogOr }
+  "^^="					{ \p s -> TModifLogXor }
 
-  "?"					{ \s -> TQuestion }
-  ":"					{ \s -> TColon }
-  ";" 					{ \s -> TSemiColon }
-  "("					{ \s -> TLeftParen }
-  ")"					{ \s -> TRightParen }
+  "?"					{ \p s -> TQuestion }
+  ":"					{ \p s -> TColon }
+  ";" 					{ \p s -> TSemiColon }
+  "("					{ \p s -> TLeftParen }
+  ")"					{ \p s -> TRightParen }
 {
 
 data Token =
