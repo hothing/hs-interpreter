@@ -6,7 +6,7 @@ import Lex
 
 %name synt
 %tokentype { Token }
-%monad { Maybe } { (>>=) } { return }
+%monad { Either String } { (>>=) } { return }
 
 %token
 	int				{ TInt $$ }
@@ -137,7 +137,7 @@ RVal:
 	
 {
 
-happyError _ = Nothing 
+happyError _ = Left "syntax error"
 
 data Program =	Program ExprList
 		deriving (Show, Eq)

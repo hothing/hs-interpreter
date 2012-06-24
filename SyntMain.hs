@@ -4,13 +4,9 @@ import Synt
 
 main = do 
   inStr <- getContents
-  case alexScanTokens inStr of
-    Right lst -> do
-      case synt lst of
-        Just tree -> do
-          putStrLn.show $ tree
-        Nothing -> do
-         putStrLn "Syntax error"
+  case alexScanTokens inStr >>= synt of
+    Right tree -> do
+       putStrLn.show $ tree
     Left err -> do
-      putStrLn $ err
+      putStrLn $ "ERROR: " ++ err
 
