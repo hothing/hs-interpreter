@@ -9,7 +9,7 @@ evalLoop ctx (x:xs) = do
        putStrLn $ show newCtx
        evalLoop newCtx xs
     Left err -> do
-      putStrLn $ "ERROR: " ++ err
+      putStrLn err
       evalLoop ctx xs
 
 evalLoop _ [] = return ()

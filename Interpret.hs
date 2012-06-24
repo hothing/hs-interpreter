@@ -41,26 +41,25 @@ evalRVal :: Context -> RVal -> Either String Int
 evalRVal ctx (IdentVal ident) = 
   case getValue ctx ident of
     Just rval -> Right rval
-    Nothing -> Left $ "Undefined variable '" ++ ident ++ "'"
+    Nothing -> Left $ "undefined variable '" ++ ident ++ "'"
 
 evalRVal _ (IfElse (IntVal x) (IntVal y) (IntVal z)) = 
   Right $ if x /= 0 then y else z
 
 evalRVal ctx (IfElse a b c) = 
-  case (evalRVal ctx a, evalRVal ctx b, evalRVal ctx c) of
-    (Right x, Right y, Right z) -> Right $ if x /= 0 then y else z
-    (Right _, Right _, err) -> err
-    (Right _, err, _) -> err
-    (err, _, _) -> err
+  let f = evalRVal ctx in
+    case f a >>= \x -> f b >>= \y -> f c >>= \z -> return (x,y,z) of
+      Right (x,y,z) -> Right $ if x /= 0 then y else z
+      Left err -> Left err
 
 evalRVal _ (BinOp cmd (IntVal x) (IntVal y)) =
   evalBinOp cmd x y
 
 evalRVal ctx (BinOp cmd a b) = 
-  case (evalRVal ctx a, evalRVal ctx b) of
-    (Right x, Right y) -> evalBinOp cmd x y
-    (Right _, err) -> err
-    (err, _) -> err
+  let f = evalRVal ctx in
+    case f a >>= \x -> f b >>= \y -> return (x,y) of
+      Right (x,y) -> evalBinOp cmd x y
+      Left err -> Left err
 
 evalRVal _ (UnOp cmd (IntVal x)) =
   evalUnOp cmd x
@@ -97,9 +96,9 @@ evalBinOp cmd x y =
     Shl -> Right $ x `shift` y
     Rol -> Right $ x `rotate` y
     Div -> if y == 0
-             then Left "Divide by zero!"
+             then Left "divide by zero"
              else Right $ x `div` y
     Mod -> if y == 0
-             then Left "Divide by zero!"
+             then Left "devide by zero"
              else Right $ x `mod` y
 
