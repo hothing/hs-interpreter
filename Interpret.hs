@@ -76,7 +76,7 @@ evalUnOp cmd x = do
 
 evalBinOp cmd x y = do
   if (cmd == Div || cmd == Mod) && (y == 0)
-    then evalError "devide by zero"
+    then evalError "divide by zero"
     else return $ case cmd of
       Add -> x + y
       Sub -> x - y
