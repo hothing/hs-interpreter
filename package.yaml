@@ -1,0 +1,51 @@
+name:                hs-interpreter
+version:             0.1.0.0
+github:              "hothing/hs-si"
+license:             BSD3
+author:              "Mykhayl Puzanov"
+maintainer:          "example@example.com"
+copyright:           "2020 Mykhayl Puzanov"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/hothing/hs-si#readme>
+
+dependencies:
+  - base >= 4.7 && < 5
+  - array
+  - containers
+
+library:
+  source-dirs: src
+
+executables:
+  hs-interpreter-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - hs-interpreter
+
+tests:
+  hs-interpreter-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - array
+      - hs-interpreter
