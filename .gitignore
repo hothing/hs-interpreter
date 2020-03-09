@@ -18,3 +18,7 @@ InterpretMain.hi
 InterpretMain.o
 InterpretMain
 *.swp
+*~
+*.lock
+*.log
+.stack-work/
